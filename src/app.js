@@ -1,4 +1,5 @@
 import express from "express";
+import { connectDatabase } from "./config/database.js";
 import authRoutes from "./routes/authRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
@@ -43,4 +44,11 @@ export function createApp() {
   });
 
   return app;
+}
+
+const app = createApp();
+
+export default async function handler(req, res) {
+  await connectDatabase();
+  return app(req, res);
 }
