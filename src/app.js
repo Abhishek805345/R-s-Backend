@@ -5,6 +5,16 @@ import healthRoutes from "./routes/healthRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
 
+async function requireDatabase(_req, _res, next) {
+  try {
+    await connectDatabase();
+    next();
+  } catch (error) {
+    error.statusCode = 503;
+    next(error);
+  }
+}
+
 export function createApp() {
   const app = express();
 
@@ -30,6 +40,10 @@ export function createApp() {
     });
   });
 
+  app.use("/api/auth", requireDatabase);
+  app.use("/api/protected", requireDatabase);
+  app.use("/api/rooms", requireDatabase);
+
   app.use("/api", healthRoutes);
   app.use("/api", authRoutes);
   app.use("/api", protectedRoutes);
@@ -49,6 +63,5 @@ export function createApp() {
 const app = createApp();
 
 export default async function handler(req, res) {
-  await connectDatabase();
   return app(req, res);
 }

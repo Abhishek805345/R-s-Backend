@@ -1,6 +1,19 @@
 import mongoose from "mongoose";
+import { connectDatabase } from "../config/database.js";
 
-export function getHealth(_req, res) {
+export async function getHealth(_req, res) {
+  try {
+    await connectDatabase();
+  } catch (error) {
+    return res.status(503).json({
+      ok: false,
+      service: "codesphere-backend",
+      database: "disconnected",
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   res.json({
     ok: true,
     service: "codesphere-backend",
